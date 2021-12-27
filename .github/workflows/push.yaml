@@ -7,7 +7,7 @@ on:
 env:
   GHREGISTRY: ghcr.io
   DHREGISTRY: docker.io
-  IMAGE_NAME: bazel
+  IMAGE_NAME: zalgonoise/bazel
 
 jobs:
   push-to-ghcr:
