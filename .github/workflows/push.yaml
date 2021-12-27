@@ -42,12 +42,19 @@ jobs:
           push: true
           tags: ${{ steps.gh-meta.outputs.tags }}
           labels: ${{ steps.gh-meta.outputs.labels }}
-
+          
+  push-to-docker-io:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      
+    steps:
       - name: Log in to Docker Container registry
         uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
         with:
           registry: ${{ env.DHREGISTRY }}
-          username: ${{ github.actor }}
+          username: ${{ env.IMAGE_AUTHOR }}
           password: ${{ secrets.DOCKER_TOKEN }}
 
       - name: Extract metadata (tags, labels) for Docker
