@@ -35,7 +35,6 @@ docker run \
   -v /src/workspace:/src/workspace \
   -v /tmp/build_output:/tmp/build_output \
   ghcr.io/zalgonoise/bazel:latest \
-  --output_user_root=/tmp/build_output \
   build //absl/...
 ```
 
