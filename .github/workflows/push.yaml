@@ -38,8 +38,8 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.gh-meta.outputs.tags }}
+          labels: ${{ steps.gh-meta.outputs.labels }}
 
       - name: Log in to Docker Container registry
         uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
@@ -59,5 +59,5 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}          
+          tags: ${{ steps.dh-meta.outputs.tags }}
+          labels: ${{ steps.dh-meta.outputs.labels }}          
