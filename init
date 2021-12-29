@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# setup user from input IDs
+PUID=${PUID:-1005}
+PGID=${PGID:-1005}
+groupmod -o -g "$PGID" bazel
+usermod -o -u "$PUID" bazel
+
+# pass ownership of /config to user
+chown -R bazel:bazel /config
+
+su bazel -c "/bin/bazel --output_user_root=/tmp/build_output $@"

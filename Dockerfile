@@ -1,42 +1,25 @@
-FROM openjdk:11-slim
-# FROM openjdk:19-bullseye
+FROM ubuntu:latest
 
-ARG BAZEL_VERSION=4.2.2
+ADD https://github.com/bazelbuild/bazelisk/releases/download/v1.11.0/bazelisk-linux-amd64 \
+    /bin/bazel
+RUN chmod +x /bin/bazel
 
-ENV UID=1000
-ENV GID=1000
+RUN apt update -y && apt install -y \
+    ca-certificates \
+    gcc g++ python3
 
-RUN apt update -y \
-    && apt install -y \
-    curl \
-    zip \
-    unzip \
-    g++ \
-    zlib1g-dev \
-    git \
-    && rm -rf /var/lib/apt/lists/*
+RUN ln -s /usr/bin/python3 /usr/bin/python
 
-RUN curl \
-    --fail \
-    --silent \
-    --show-error \
-    --location \
-    --output bazel.deb.sha256 \
-    "https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel_${BAZEL_VERSION}-linux-x86_64.deb.sha256"
+RUN useradd --uid 1005 --home /config --shell  /bin/bash bazel \
+    && echo "bazel    ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers \
+    && mkdir -p /config/src /tmp/build_output \
+    && chown bazel:bazel /tmp/build_output 
 
-RUN curl \
-    --fail \
-    --silent \
-    --show-error \
-    --location \
-    --remote-name \
-    "https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel_${BAZEL_VERSION}-linux-x86_64.deb" \
-    && cat bazel.deb.sha256 | sha256sum -c - 
 
-RUN dpkg -i "bazel_${BAZEL_VERSION}-linux-x86_64.deb" \
-    && rm "bazel_${BAZEL_VERSION}-linux-x86_64.deb" bazel.deb.sha256
-
-WORKDIR /src/workspace
+WORKDIR /config/src
 RUN mkdir -p /tmp/build_output
-COPY entrypoint.sh /
-ENTRYPOINT [ "/entrypoint.sh" ]
+COPY init /init
+
+# USER bazel
+ENTRYPOINT [ "/init" ]
+CMD [ "su", "bazel", "-c", "/bin/bazel", "--output_user_root=/tmp/build_output" ]

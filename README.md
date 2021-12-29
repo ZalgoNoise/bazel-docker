@@ -18,7 +18,9 @@ However, Docker deployments of Bazel (by the time of launch of this repo) were v
 
 [Bazelisk](https://github.com/bazelbuild/bazelisk) was an option to look into, starting with their template [GitHub Actions](https://github.com/marketplace/actions/setup-bazelisk). But to run locally (and even being able to deploy on incompatible platforms for Bazel), a Docker version would be nice -- and has even been requested several times, in fact.
 
-This image promises to achieve that desire by configuring Bazel in an OpenJDK 11 container. The resulting image is quite large (at 822 MB), but the goal is to build a lighter version of the same. For the moment, this is a working Dockerized Bazel 4.2.2.
+This image promises to achieve that desire by configuring Bazel in a Debian-based container, and installing either Bazelisk or Bazel, allowing the flexibility of Docker alongside Bazel's build system and commodity. This no longer results in a 1GB image size, either.
+
+
 
 ### Runtime
 
@@ -29,11 +31,11 @@ Your cache should be attached to the container on its `/tmp/build_output` folder
 Container runtime follows the indications of the [Bazel Docker Container docs](https://docs.bazel.build/versions/2.2.0/bazel-container.html), but pointing to this container (and without defining already set properties):
 
 ```
-docker run \
-  -e USER="$(id -u)" \
-  -u="$(id -u)" \
-  -v /src/workspace:/src/workspace \
-  -v /tmp/build_output:/tmp/build_output \
+docker run --rm -ti \
+  -e PUID=${UID} \
+  -e PGID=${GID} \
+  -v /src/workspace:/config/src \
+  -v ${HOME}/.cache/bazel/_bazel_${USER}:/tmp/build_output \
   ghcr.io/zalgonoise/bazel:latest \
   build //absl/...
 ```
@@ -44,15 +46,13 @@ The container's entrypoint script already contains a flag to set the cache to `/
 bazel --output_user_root=/tmp/build_output $@
 ```
 
-Optionally, you can also run the container interactively, so you can access the bazel command directly:
+Optionally, you can also run the container interactively (as root), add a custom entrypoint flag to get a shell instead of setting up and logging in with your `bazel` user -- which has the same UID / GID as your user:
 
 ```
-docker run \
-  -e USER="$(id -u)" \
-  -u="$(id -u)" \
-  -v /src/workspace:/src/workspace \
-  -v /tmp/build_output:/tmp/build_output \
+docker run -ti \
   --entrypoint=/bin/bash \
+  -v /src/workspace:/config/src \
+  -v ${HOME}/.cache/bazel/_bazel_${USER}:/tmp/build_output \
   ghcr.io/zalgonoise/bazel:latest 
 ```
 
