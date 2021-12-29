@@ -55,6 +55,96 @@ docker run -ti \
   -v ${HOME}/.cache/bazel/_bazel_${USER}:/tmp/build_output \
   ghcr.io/zalgonoise/bazel:latest 
 ```
+___________
+
+## Building the container
+
+You can build the container wither `docker` or `docker-compose`, while also being able to specify its Bazel version.
+
+#### Ubuntu container
+
+With `docker`, using the `ubuntu` base image:
+
+```
+BAZEL_VERSION=6.0.0-pre.20211215.3
+docker build \
+  -t bazel:${BAZEL_VERSION} \
+  -f Dockerfile_ubuntu \
+  --build-arg BAZEL_VERSION=${BAZEL_VERSION} \
+  .
+```
+
+With `docker-compose`, using the `ubuntu` base image:
+
+```
+BAZEL_VERSION=6.0.0-pre.20211215.3
+docker-compose build \
+  --parallel \
+  --build-arg BAZEL_VERSION=${BAZEL_VERSION} \
+  bazel-ubuntu
+```
+
+
+#### Debian container
+
+With `docker`, using the `debian` base image:
+
+```
+BAZEL_VERSION=6.0.0-pre.20211215.3
+docker build \
+  -t bazel:${BAZEL_VERSION} \
+  -f Dockerfile_debian \
+  --build-arg BAZEL_VERSION=${BAZEL_VERSION} \
+  .
+```
+
+With `docker-compose`, using the `debian` base image:
+
+```
+BAZEL_VERSION=6.0.0-pre.20211215.3
+docker-compose build \
+  --parallel \
+  --build-arg BAZEL_VERSION=${BAZEL_VERSION} \
+  bazel-debian
+```
+
+#### Building all versions 
+
+Speeding up this process, there is a `docker-compose.yaml` file which takes in the versions listed in `.env` and creates a set of tagged images accordingly:
+
+```
+BAZEL6=6.0.0-pre.20211215.3
+BAZEL5=5.0.0-pre.20211011.2
+BAZELL=4.2.2
+```
+
+Each image is listed in the compose file, as a service:
+
+```
+version: "3.7"
+services:
+
+(...)
+
+  bazel-4.2.2:
+    build:
+      context: .
+      dockerfile: ./Dockerfile_ubuntu
+      args: 
+        BAZEL_VERSION: ${BAZELL}
+    image: bazel:${BAZELL}
+
+(...)
+```
+
+To build and tag all images and versions, you can run the `docker-compose` command below:
+
+```
+docker-compose build --parallel
+```
+
+The `versionpush.sh` file is a temporary placeholder to quickly push all tagged images to my repository, from an authorized machine.
+
 
 ___________
 
