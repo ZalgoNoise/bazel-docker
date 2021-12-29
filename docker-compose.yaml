@@ -1,0 +1,150 @@
+version: "3.7"
+services:
+
+  bazel:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    image: bazel:latest
+
+  bazelisk:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    image: bazelisk:latest
+
+  bazel-ubuntu:
+    build:
+      context: .
+      dockerfile: ./Dockerfile_ubuntu
+      args: 
+        BAZEL_VERSION: ${BAZELL}
+    image: bazel:ubuntu
+
+  bazel-4.2.2:
+    build:
+      context: .
+      dockerfile: ./Dockerfile_ubuntu
+      args: 
+        BAZEL_VERSION: ${BAZELL}
+    image: bazel:${BAZELL}
+
+  bazel-ubuntu-4.2.2:
+    build:
+      context: .
+      dockerfile: ./Dockerfile_ubuntu
+      args: 
+        BAZEL_VERSION: ${BAZELL}
+    image: bazel:ubuntu-${BAZELL}
+
+  bazel-6:
+    build:
+      context: .
+      dockerfile: ./Dockerfile_ubuntu
+      args: 
+        BAZEL_VERSION: ${BAZEL6}
+    image: bazel:6
+
+  bazel-ubuntu-6:
+    build:
+      context: .
+      dockerfile: ./Dockerfile_ubuntu
+      args: 
+        BAZEL_VERSION: ${BAZEL6}
+    image: bazel:ubuntu-6    
+
+  bazel-6.0.0-pre.20211215.3:
+    build:
+      context: .
+      dockerfile: ./Dockerfile_ubuntu
+      args: 
+        BAZEL_VERSION: ${BAZEL6}
+    image: bazel:${BAZEL6}
+
+  bazel-ubuntu-6.0.0-pre.20211215.3:
+    build:
+      context: .
+      dockerfile: ./Dockerfile_ubuntu
+      args: 
+        BAZEL_VERSION: ${BAZEL6}
+    image: bazel:ubuntu-${BAZEL6}
+
+  bazel-5:
+    build:
+      context: .
+      dockerfile: ./Dockerfile_ubuntu
+      args: 
+        BAZEL_VERSION: ${BAZEL5}
+    image: bazel:5
+
+  bazel-ubuntu-5:
+    build:
+      context: .
+      dockerfile: ./Dockerfile_ubuntu
+      args: 
+        BAZEL_VERSION: ${BAZEL5}
+    image: bazel:ubuntu-5    
+
+  bazel-5.0.0-pre.20211011.2:
+    build:
+      context: .
+      dockerfile: ./Dockerfile_ubuntu
+      args: 
+        BAZEL_VERSION: ${BAZEL5}
+    image: bazel:${BAZEL5}
+
+  bazel-ubuntu-5.0.0-pre.20211011.2:
+    build:
+      context: .
+      dockerfile: ./Dockerfile_ubuntu
+      args: 
+        BAZEL_VERSION: ${BAZEL5}
+    image: bazel:ubuntu-${BAZEL5}
+
+  bazel-debian:
+    build:
+      context: .
+      dockerfile: ./Dockerfile_debian
+      args: 
+        BAZEL_VERSION: ${BAZELL}
+    image: bazel:debian
+
+  bazel-debian-4.2.2:
+    build:
+      context: .
+      dockerfile: ./Dockerfile_debian
+      args: 
+        BAZEL_VERSION: ${BAZELL}
+    image: bazel:debian-${BAZELL}
+
+  bazel-debian-6:
+    build:
+      context: .
+      dockerfile: ./Dockerfile_debian
+      args: 
+        BAZEL_VERSION: ${BAZEL6}
+    image: bazel:debian-6    
+
+  bazel-debian-6.0.0-pre.20211215.3:
+    build:
+      context: .
+      dockerfile: ./Dockerfile_debian
+      args: 
+        BAZEL_VERSION: ${BAZEL6}
+    image: bazel:debian-${BAZEL6}
+
+  bazel-debian-5:
+    build:
+      context: .
+      dockerfile: ./Dockerfile_debian
+      args: 
+        BAZEL_VERSION: ${BAZEL5}
+    image: bazel:debian-5    
+
+  bazel-debian-5.0.0-pre.20211011.2:
+    build:
+      context: .
+      dockerfile: ./Dockerfile_debian
+      args: 
+        BAZEL_VERSION: ${BAZEL5}
+    image: bazel:debian-${BAZEL5}    

@@ -6,7 +6,8 @@ RUN chmod +x /bin/bazel
 
 RUN apt update -y && apt install -y \
     ca-certificates \
-    gcc g++ python3
+    gcc g++ python3 \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN ln -s /usr/bin/python3 /usr/bin/python
 
@@ -20,6 +21,5 @@ WORKDIR /config/src
 RUN mkdir -p /tmp/build_output
 COPY init /init
 
-# USER bazel
 ENTRYPOINT [ "/init" ]
 CMD [ "su", "bazel", "-c", "/bin/bazel", "--output_user_root=/tmp/build_output" ]

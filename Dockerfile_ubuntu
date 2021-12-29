@@ -1,0 +1,42 @@
+FROM ubuntu:latest
+
+RUN apt update -y && apt install -y \
+    ca-certificates \ 
+    gcc g++ python3 \
+    curl zip unzip zlib1g-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN ln -s /usr/bin/python3 /usr/bin/python
+
+ARG BAZEL_VERSION
+RUN curl \
+    --fail \
+    --silent \
+    --show-error \
+    --location \
+    --output bazel.deb.sha256 \
+    "https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel_${BAZEL_VERSION}-linux-x86_64.deb.sha256"
+
+RUN curl \
+    --fail \
+    --silent \
+    --show-error \
+    --location \
+    --remote-name \
+    "https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel_${BAZEL_VERSION}-linux-x86_64.deb" \
+    && cat bazel.deb.sha256 | sha256sum -c - 
+
+RUN dpkg -i "bazel_${BAZEL_VERSION}-linux-x86_64.deb" \
+    && rm "bazel_${BAZEL_VERSION}-linux-x86_64.deb" bazel.deb.sha256
+
+RUN useradd --uid 1005 --home /config --shell  /bin/bash bazel \
+    && echo "bazel    ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers \
+    && mkdir -p /config/src /tmp/build_output \
+    && chown bazel:bazel /tmp/build_output 
+
+WORKDIR /config/src
+RUN mkdir -p /tmp/build_output
+COPY init /init
+
+ENTRYPOINT [ "/init" ]
+CMD [ "su", "bazel", "-c", "/bin/bazel", "--output_user_root=/tmp/build_output" ]
