@@ -1,0 +1,72 @@
+load("@bazel_gazelle//:def.bzl", "gazelle")
+load("@com_github_bazelbuild_buildtools//buildifier:def.bzl", "buildifier")
+load("@io_bazel_rules_docker//container:container.bzl", "container_image")
+load("@io_bazel_rules_docker//docker/util:run.bzl", "container_run_and_commit_layer") 
+
+
+
+# gazelle:prefix github.com/ZalgoNoise/bazel-docker
+gazelle(name = "gazelle")
+
+buildifier(
+    name = "buildifier-check",
+    lint_mode = "warn",
+    mode = "check",
+    multi_diff = True,
+)
+
+buildifier(
+    name = "buildifier-fix",
+    lint_mode = "fix",
+    mode = "fix",
+    multi_diff = True,
+)
+
+
+sh_binary(
+    name = "init-sh",
+    srcs = [
+        "init"
+    ]
+)
+
+container_run_and_commit_layer(
+    name = "ubuntu-4_2_2-setup",
+    image = "@ubuntu_amd64//image",
+    commands = [
+        "apt update -y",
+        "apt install -y ca-certificates gcc g++ python3 curl zip unzip zlib1g-dev",
+        "rm -rf /var/lib/apt/lists/*",
+        "ln -s /usr/bin/python3 /usr/bin/python",
+        "curl --fail --silent --show-error --location --output /tmp/bazel.deb.sha256 'https://github.com/bazelbuild/bazel/releases/download/4.2.2/bazel_4.2.2-linux-x86_64.deb.sha256'",
+        "curl --fail --silent --show-error --location --remote-name https://github.com/bazelbuild/bazel/releases/download/4.2.2/bazel_4.2.2-linux-x86_64.deb",
+        "cat /tmp/bazel.deb.sha256 | sha256sum -c -",
+        "dpkg -i bazel_4.2.2-linux-x86_64.deb",
+        "rm /tmp/*",
+        "useradd --uid 1005 --home /config --shell  /bin/bash bazel",
+        "echo 'bazel    ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers",
+        "mkdir -p /config/src /tmp/build_output",
+        "chown bazel:bazel /tmp/build_output ",
+    ],
+)
+
+
+
+
+container_image(
+    name = "ubuntu-4.2.2",
+    base = "@ubuntu_amd64//image",
+    layers = [
+        ":ubuntu-4_2_2-setup",
+    ],
+    entrypoint = ["/init"],
+    files = [":init-sh"],
+    workdir = "/config/src",
+    cmd = [
+        "su", 
+        "bazel", 
+        "-c", 
+        "/bin/bazel", 
+        "--output_user_root=/tmp/build_output",
+    ],
+)
