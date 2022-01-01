@@ -1,7 +1,7 @@
 FROM ubuntu:latest
 
 RUN apt update -y && apt install -y \
-    ca-certificates \ 
+    ca-certificates \
     gcc g++ python3 \
     curl zip unzip zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
